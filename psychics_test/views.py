@@ -34,8 +34,11 @@ def guesses(request):
                     'psychics': psychics_controller.get_all(session_id)}
     elif request.method == 'POST':
         try:
+            number = int(request.body)
+            if number not in range(10, 100):
+                raise ValueError
             response = {'psychics': psychics_controller.check_all(
-                int(request.body), session_id)}
+                number, session_id)}
         except ValueError:
             response = {'error': 'Неверно загаданное число. '
                                  'Введите значения от 10 до 99.'}
