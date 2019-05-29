@@ -11,9 +11,25 @@ class Psychic:
         :param name: Psychic name
         """
         self.name = name
-        self.rating = 0
         self.last_guess = {}
         self.history = {}
+        self._rating = {}
+
+    def get_rating(self, session):
+        """ Returns psychic rating for session
+
+        :param session: session id
+        :return: psychic rating for session
+        """
+        return self._rating.setdefault(session, 0)
+
+    def change_rating(self, session, increase_number):
+        """ Change psychic rating for session
+
+        :param session: session id
+        :param increase_number: the number by which change rating
+        """
+        self._rating[session] = self.get_rating(session) + increase_number
 
     def try_to_guess(self, session):
         """ Request psychic guess
@@ -31,7 +47,8 @@ class Psychic:
         :param session: session id
         :return: if psychic is guessed
         """
-        self.rating += 1 if self.last_guess[session] == number else -1
+        self.change_rating(
+            session, 1 if self.last_guess[session] == number else -1)
         history = self.history.setdefault(session, [])
         history.append({'number': number, 'guess': self.last_guess[session]})
         return self.last_guess == number
@@ -77,5 +94,5 @@ class PsychicsController:
         """
         return [{'name': psychic.name,
                  'history': psychic.history.get(session),
-                 'rating': psychic.rating}
+                 'rating': psychic.get_rating(session)}
                 for psychic in self.psychics]
